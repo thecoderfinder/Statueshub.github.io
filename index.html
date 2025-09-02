@@ -14,10 +14,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden;
+            overflow-y: auto; /* Enable vertical scrolling */
             transition: all 0.5s ease;
             position: relative;
-            height: 100vh;
+            height: 100%; /* Allow full height with scroll */
+            min-height: 100vh;
         }
         .container {
             position: relative;
@@ -25,6 +26,7 @@
             max-width: 1200px;
             overflow: hidden;
             padding: 0 20px;
+            flex: 1 0 auto; /* Ensure container respects scroll */
         }
         .stars {
             position: absolute;
@@ -483,6 +485,11 @@
                 <button class="btn">Join Server</button>
                 <button class="btn" onclick="showPackagesSection()">Unity Packages and Videos</button>
             </div>
+            <!-- Additional content to test scrolling -->
+            <div style="height: 1000px; background: rgba(75, 0, 130, 0.5); margin-top: 20px; padding: 20px;">
+                <h2>More Content</h2>
+                <p>This section is here to ensure scrolling works. Add more details or sections as needed!</p>
+            </div>
         </div>
         <div class="second-section" id="packages-section">
             <span class="close-btn" onclick="hidePackagesSection()">&times;</span>
@@ -563,7 +570,7 @@
             notification.style.display = 'block';
             setTimeout(() => {
                 notification.style.display = 'none';
-            }, 5000); // Disappear after 5 seconds
+            }, 5000);
         }
 
         function toggleBackgroundOptions() {
@@ -594,11 +601,26 @@
                 const popup = document.getElementById('broadcast-popup');
                 popup.textContent = message;
                 popup.style.display = 'block';
+                // Notify all open tabs
+                window.dispatchEvent(new Event('globalMessage'));
                 setTimeout(() => {
                     popup.style.display = 'none';
-                }, 5000); // Disappear after 5 seconds
+                }, 5000);
             }
         }
+
+        // Listen for global message event across tabs
+        window.addEventListener('globalMessage', () => {
+            const popup = document.getElementById('broadcast-popup');
+            const message = document.getElementById('global-message').value;
+            if (message && popup.style.display !== 'block') {
+                popup.textContent = message;
+                popup.style.display = 'block';
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                }, 5000);
+            }
+        });
 
         let debugMode = false;
         function toggleDebugMode() {
@@ -640,7 +662,7 @@
                 popup.style.display = 'block';
                 setTimeout(() => {
                     popup.style.display = 'none';
-                }, 2000); // Close after 2 seconds
+                }, 2000);
             }, 1000);
         }
     </script>
