@@ -418,7 +418,34 @@
             font-size: 1.5em;
             color: #d4a4eb;
         }
-
+        .debug-instructions {
+            display: none;
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            background: rgba(75, 0, 130, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            z-index: 1002;
+            max-width: 250px;
+        }
+        .editable-text {
+            cursor: pointer;
+        }
+        .custom-button {
+            background: linear-gradient(135deg, #a9b1d6, #d4a4eb);
+            color: #000000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+        .custom-button:hover {
+            background: linear-gradient(135deg, #d4a4eb, #a9b1d6);
+        }
         /* Responsive Design */
         @media (max-width: 768px) {
             .content, .second-section, .options-section {
@@ -461,6 +488,11 @@
                 font-size: 1.2em;
                 padding: 15px;
             }
+            .debug-instructions {
+                top: 80px;
+                left: 10px;
+                max-width: 200px;
+            }
         }
     </style>
 </head>
@@ -474,8 +506,8 @@
             <a href="#" onclick="showMoreSection()">More</a>
         </nav>
         <div class="content" id="main-content">
-            <h1>Welcome to Statues Hub</h1>
-            <p>Your ultimate destination for Unity packages, videos, and more.</p>
+            <h1 class="editable-text">Welcome to Statues Hub</h1>
+            <p class="editable-text">Your ultimate destination for Unity packages, videos, and more.</p>
             <div class="nav-buttons">
                 <div class="nav-btn"><span class="icon"></span>Scripts</div>
                 <div class="nav-btn"><span class="icon"></span>Packages</div>
@@ -490,17 +522,23 @@
             <span class="close-btn" onclick="hidePackagesSection()">&times;</span>
             <input type="text" class="search-bar" placeholder="Search Videos and Unity Packages..." oninput="filterItems(this.value)">
             <div class="item" onclick="showOptionsSection()">Statues Clean Up</div>
+            <div class="item" onclick="showBanOptionsSection()">Showing PlayFab Ban Reason and Time</div>
         </div>
-        <div class="options-section" id="options-section">
+        <div class="options-section" id="options-section" style="display: none;">
             <span class="close-btn" onclick="hideOptionsSection()">&times;</span>
             <button class="option-btn" onclick="showYoutubePopup()">Youtube</button>
-            <button class="option-btn" onclick="showDownloadNotification()">Download</button>
+            <button class="option-btn" onclick="downloadStatuesCleanup()">Download</button>
+        </div>
+        <div class="options-section" id="ban-options-section" style="display: none;">
+            <span class="close-btn" onclick="hideBanOptionsSection()">&times;</span>
+            <button class="option-btn" onclick="showYoutubePopup()">Youtube</button>
+            <button class="option-btn" onclick="downloadBanInfo()">Download</button>
         </div>
         <div class="second-section" id="more-section" style="display: none;">
             <span class="close-btn" onclick="hideMoreSection()">&times;</span>
             <div style="background: rgba(75, 0, 130, 0.5); margin-top: 20px; padding: 20px;">
-                <h2>More Content</h2>
-                <p>This section is here to ensure scrolling works. Add more details or sections as needed!</p>
+                <h2 class="editable-text">More Content</h2>
+                <p class="editable-text">This section is here to ensure scrolling works. Add more details or sections as needed!</p>
             </div>
         </div>
         <div id="youtube-popup" class="popup">
@@ -523,6 +561,9 @@
         </div>
         <div id="broadcast-popup" class="broadcast-popup"></div>
         <div id="notification" class="notification"></div>
+        <div id="debug-instructions" class="debug-instructions">
+            <p>Debug Mode Instructions:<br>- Double-click text to edit (temporary).<br>- Quadruple-click to add a customizable button.</p>
+        </div>
     </div>
 
     <script>
@@ -542,10 +583,68 @@
         }
         createStars();
 
+        let debugMode = false;
+
+        function toggleDebugMode() {
+            debugMode = !debugMode;
+            const instructions = document.getElementById('debug-instructions');
+            instructions.style.display = debugMode ? 'block' : 'none';
+            if (debugMode) {
+                console.log('Debug Mode Activated');
+                alert('Debug Mode ON - Check console for logs and follow instructions.');
+                document.querySelectorAll('.editable-text').forEach(element => {
+                    element.addEventListener('dblclick', () => {
+                        if (debugMode) {
+                            const currentText = element.textContent;
+                            const input = document.createElement('input');
+                            input.value = currentText;
+                            input.style.width = `${element.offsetWidth}px`;
+                            input.style.padding = '5px';
+                            input.style.borderRadius = '5px';
+                            element.textContent = '';
+                            element.appendChild(input);
+                            input.focus();
+                            input.onblur = input.onkeydown = (e) => {
+                                if (e.type === 'blur' || e.key === 'Enter') {
+                                    element.textContent = input.value || currentText;
+                                    element.appendChild(document.createTextNode(element.textContent));
+                                }
+                            };
+                        }
+                    });
+                    element.addEventListener('click', (e) => {
+                        if (debugMode) {
+                            let clickCount = element.getAttribute('data-click-count') || 0;
+                            clickCount = parseInt(clickCount) + 1;
+                            element.setAttribute('data-click-count', clickCount);
+                            if (clickCount === 4) {
+                                const button = document.createElement('button');
+                                button.className = 'custom-button';
+                                button.textContent = 'New Button';
+                                const action = prompt('Enter button action (e.g., alert("Hello")):');
+                                if (action) {
+                                    button.onclick = new Function(action);
+                                }
+                                element.parentNode.insertBefore(button, element.nextSibling);
+                                element.setAttribute('data-click-count', 0);
+                            } else if (clickCount > 4) {
+                                element.setAttribute('data-click-count', 0);
+                            }
+                        }
+                    });
+                });
+            } else {
+                console.log('Debug Mode Deactivated');
+                alert('Debug Mode OFF');
+            }
+        }
+
         function showPackagesSection() {
             document.getElementById('packages-section').style.display = 'block';
             document.getElementById('main-content').style.display = 'none';
             document.getElementById('more-section').style.display = 'none';
+            document.getElementById('options-section').style.display = 'none';
+            document.getElementById('ban-options-section').style.display = 'none';
         }
 
         function hidePackagesSection() {
@@ -556,6 +655,7 @@
         function showOptionsSection() {
             document.getElementById('options-section').style.display = 'block';
             document.getElementById('packages-section').style.display = 'none';
+            document.getElementById('ban-options-section').style.display = 'none';
         }
 
         function hideOptionsSection() {
@@ -563,20 +663,237 @@
             document.getElementById('packages-section').style.display = 'block';
         }
 
+        function showBanOptionsSection() {
+            document.getElementById('ban-options-section').style.display = 'block';
+            document.getElementById('packages-section').style.display = 'none';
+            document.getElementById('options-section').style.display = 'none';
+        }
+
+        function hideBanOptionsSection() {
+            document.getElementById('ban-options-section').style.display = 'none';
+            document.getElementById('packages-section').style.display = 'block';
+        }
+
         function showYoutubePopup() {
             document.getElementById('youtube-popup').style.display = 'block';
             setTimeout(() => {
                 document.getElementById('youtube-popup').style.display = 'none';
-            }, 5000); // Hide after 5 seconds
+            }, 5000);
         }
 
-        function showDownloadNotification() {
-            const notification = document.getElementById('notification');
-            notification.textContent = 'Not official yet, still being verified';
-            notification.style.display = 'block';
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 5000);
+        function downloadStatuesCleanup() {
+            alert('Still Verifying');
+        }
+
+        function downloadBanInfo() {
+            const code = `using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using PlayFab;
+using System.Threading.Tasks;
+using PlayFab.ClientModels;
+using UnityEngine.SceneManagement;
+using System.Globalization;
+using System;
+using TMPro;
+using Photon.VR;
+
+public class Playfablogin : MonoBehaviour
+{
+    [Header("COSMETICS")]
+    public static Playfablogin instance;
+    public string MyPlayFabID;
+    public string CatalogName;
+    public List<GameObject> specialitems;
+    public List<GameObject> disableitems;
+    [Header("CURRENCY")]
+    public string CurrencyName;
+    public TextMeshPro currencyText;
+    public int coins;
+    [Header("BAN STUFF")]
+    public GameObject[] StuffToDisable;
+    public GameObject[] StuffToEnable;
+    public MeshRenderer[] StuffToMaterialChange;
+    public Material MaterialToChangeToo;
+    public TextMeshPro[] BanTimes;
+    public TextMeshPro[] BanReasons;
+    [Header("TITLE DATA")]
+    public TextMeshPro MOTDText;
+    [Header("PLAYER DATA")]
+    public TextMeshPro UserName;
+    public string StartingUsername;
+    public string Name;
+    [SerializeField]
+    public bool UpdateName;
+    [Header("DON'T DESTROY ON LOAD")]
+    public GameObject[] DDOLObjects;
+
+    public void Awake()
+    {
+        instance = this;
+    }
+
+    void Start()
+    {
+        login();
+    }
+
+    public void login()
+    {
+        var request = new LoginWithCustomIDRequest
+        {
+            CustomId = SystemInfo.deviceUniqueIdentifier,
+            CreateAccount = true,
+            InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+            {
+                GetPlayerProfile = true
+            }
+        };
+        PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnError);
+    }
+
+    public void OnLoginSuccess(LoginResult result)
+    {
+        Debug.Log("logging in");
+        GetAccountInfoRequest InfoRequest = new GetAccountInfoRequest();
+        PlayFabClientAPI.GetAccountInfo(InfoRequest, AccountInfoSuccess, OnError);
+        StartCoroutine(DDOLStuff());
+        GetVirtualCurrencies();
+        GetMOTD();
+    }
+
+    public void AccountInfoSuccess(GetAccountInfoResult result)
+    {
+        MyPlayFabID = result.AccountInfo.PlayFabId;
+
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
+        (result) =>
+        {
+            foreach (var item in result.Inventory)
+            {
+                if (item.CatalogVersion == CatalogName)
+                {
+                    for (int i = 0; i < specialitems.Count; i++)
+                    {
+                        if (specialitems[i].name == item.ItemId)
+                        {
+                            specialitems[i].SetActive(true);
+                        }
+                    }
+                    for (int i = 0; i < disableitems.Count; i++)
+                    {
+                        if (disableitems[i].name == item.ItemId)
+                        {
+                            disableitems[i].SetActive(false);
+                        }
+                    }
+                }
+            }
+        },
+        (error) =>
+        {
+            Debug.LogError(error.GenerateErrorReport());
+        });
+    }
+
+    async void Update()
+    {
+    }
+
+    public void GetVirtualCurrencies()
+    {
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), OnGetUserInventorySuccess, OnError);
+    }
+
+    void OnGetUserInventorySuccess(GetUserInventoryResult result)
+    {
+        coins = result.VirtualCurrency["GB"];
+        currencyText.text = "You Have : " + coins.ToString() + " " + CurrencyName;
+    }
+
+    private void OnError(PlayFabError error)
+    {
+        if (error.Error == PlayFabErrorCode.AccountBanned)
+        {
+            PhotonVRManager.Manager.Disconnect();
+            foreach (GameObject obj in StuffToDisable)
+            {
+                obj.SetActive(false);
+            }
+            foreach (GameObject obj in StuffToEnable)
+            {
+                obj.SetActive(true);
+            }
+            foreach (MeshRenderer rend in StuffToMaterialChange)
+            {
+                rend.material = MaterialToChangeToo;
+            }
+            foreach (var item in error.ErrorDetails)
+            {
+                foreach (TextMeshPro BanTime in BanTimes)
+                {
+                    if (item.Value[0] == "Indefinite")
+                    {
+                        BanTime.text = "Permanent Ban";
+                    }
+                    else
+                    {
+                        string playFabTime = item.Value[0];
+                        DateTime unityTime;
+                        try
+                        {
+                            unityTime = DateTime.ParseExact(playFabTime, "yyyy-MM-dd'T'HH:mm:ss", CultureInfo.InvariantCulture);
+                            TimeSpan timeLeft = unityTime.Subtract(DateTime.UtcNow);
+                            int hoursLeft = (int)timeLeft.TotalHours;
+                            BanTime.text = string.Format("Hours Left: {0}", hoursLeft);
+                        }
+                        catch (FormatException ex)
+                        {
+                            Debug.LogErrorFormat("Failed to parse PlayFab time '{0}': {1}", playFabTime, ex.Message);
+                        }
+                    }
+                }
+                foreach (TextMeshPro BanReason in BanReasons)
+                {
+                    BanReason.text = string.Format("Reason: {0}", item.Key);
+                }
+            }
+        }
+        else
+        {
+            login();
+        }
+    }
+
+    public void GetMOTD()
+    {
+        PlayFabClientAPI.GetTitleData(new GetTitleDataRequest(), MOTDGot, OnError);
+    }
+
+    public void MOTDGot(GetTitleDataResult result)
+    {
+        if (result.Data == null || result.Data.ContainsKey("MOTD") == false)
+        {
+            Debug.Log("No MOTD");
+            return;
+        }
+        MOTDText.text = result.Data["MOTD"];
+    }
+    IEnumerator DDOLStuff()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        yield return new WaitForSeconds(0.1f);
+        foreach (GameObject Obj in DDOLObjects)
+        {
+            DontDestroyOnLoad(Obj);
+        }
+    }
+}`;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Playfablogin.cs';
+            a.click();
         }
 
         function toggleBackgroundOptions() {
@@ -628,18 +945,6 @@
             }
         });
 
-        let debugMode = false;
-        function toggleDebugMode() {
-            debugMode = !debugMode;
-            if (debugMode) {
-                console.log('Debug Mode Activated');
-                alert('Debug Mode ON - Check console for logs.');
-            } else {
-                console.log('Debug Mode Deactivated');
-                alert('Debug Mode OFF');
-            }
-        }
-
         function filterItems(query) {
             const items = document.querySelectorAll('.item');
             items.forEach(item => {
@@ -674,12 +979,16 @@
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('packages-section').style.display = 'none';
             document.getElementById('more-section').style.display = 'none';
+            document.getElementById('options-section').style.display = 'none';
+            document.getElementById('ban-options-section').style.display = 'none';
         }
 
         function showMoreSection() {
             document.getElementById('more-section').style.display = 'block';
             document.getElementById('main-content').style.display = 'none';
             document.getElementById('packages-section').style.display = 'none';
+            document.getElementById('options-section').style.display = 'none';
+            document.getElementById('ban-options-section').style.display = 'none';
         }
 
         function hideMoreSection() {
