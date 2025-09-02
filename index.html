@@ -14,10 +14,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-y: auto; /* Enable vertical scrolling */
+            overflow-y: auto;
             transition: all 0.5s ease;
             position: relative;
-            height: 100%; /* Allow full height with scroll */
+            height: 100%;
             min-height: 100vh;
         }
         .container {
@@ -26,7 +26,7 @@
             max-width: 1200px;
             overflow: hidden;
             padding: 0 20px;
-            flex: 1 0 auto; /* Ensure container respects scroll */
+            flex: 1 0 auto;
         }
         .stars {
             position: absolute;
@@ -469,9 +469,9 @@
         <div class="stars"></div>
         <nav>
             <a href="#" onclick="checkPassword()">Statues Hub</a>
-            <a href="#">Home</a>
+            <a href="#" onclick="showHome()">Home</a>
             <a href="#" onclick="toggleBackgroundOptions()">Background</a>
-            <a href="#">More</a>
+            <a href="#" onclick="showMoreSection()">More</a>
         </nav>
         <div class="content" id="main-content">
             <h1>Welcome to Statues Hub</h1>
@@ -485,11 +485,6 @@
                 <button class="btn">Join Server</button>
                 <button class="btn" onclick="showPackagesSection()">Unity Packages and Videos</button>
             </div>
-            <!-- Additional content to test scrolling -->
-            <div style="height: 1000px; background: rgba(75, 0, 130, 0.5); margin-top: 20px; padding: 20px;">
-                <h2>More Content</h2>
-                <p>This section is here to ensure scrolling works. Add more details or sections as needed!</p>
-            </div>
         </div>
         <div class="second-section" id="packages-section">
             <span class="close-btn" onclick="hidePackagesSection()">&times;</span>
@@ -500,6 +495,13 @@
             <span class="close-btn" onclick="hideOptionsSection()">&times;</span>
             <button class="option-btn" onclick="showYoutubePopup()">Youtube</button>
             <button class="option-btn" onclick="showDownloadNotification()">Download</button>
+        </div>
+        <div class="second-section" id="more-section" style="display: none;">
+            <span class="close-btn" onclick="hideMoreSection()">&times;</span>
+            <div style="background: rgba(75, 0, 130, 0.5); margin-top: 20px; padding: 20px;">
+                <h2>More Content</h2>
+                <p>This section is here to ensure scrolling works. Add more details or sections as needed!</p>
+            </div>
         </div>
         <div id="youtube-popup" class="popup">
             <p>Coming Soon</p>
@@ -543,6 +545,7 @@
         function showPackagesSection() {
             document.getElementById('packages-section').style.display = 'block';
             document.getElementById('main-content').style.display = 'none';
+            document.getElementById('more-section').style.display = 'none';
         }
 
         function hidePackagesSection() {
@@ -562,6 +565,9 @@
 
         function showYoutubePopup() {
             document.getElementById('youtube-popup').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('youtube-popup').style.display = 'none';
+            }, 5000); // Hide after 5 seconds
         }
 
         function showDownloadNotification() {
@@ -598,27 +604,27 @@
         function sendGlobalMessage() {
             const message = document.getElementById('global-message').value;
             if (message) {
+                localStorage.setItem('globalMessage', message);
                 const popup = document.getElementById('broadcast-popup');
                 popup.textContent = message;
                 popup.style.display = 'block';
-                // Notify all open tabs
-                window.dispatchEvent(new Event('globalMessage'));
                 setTimeout(() => {
                     popup.style.display = 'none';
                 }, 5000);
             }
         }
 
-        // Listen for global message event across tabs
-        window.addEventListener('globalMessage', () => {
-            const popup = document.getElementById('broadcast-popup');
-            const message = document.getElementById('global-message').value;
-            if (message && popup.style.display !== 'block') {
-                popup.textContent = message;
-                popup.style.display = 'block';
-                setTimeout(() => {
-                    popup.style.display = 'none';
-                }, 5000);
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'globalMessage') {
+                const message = event.newValue;
+                if (message) {
+                    const popup = document.getElementById('broadcast-popup');
+                    popup.textContent = message;
+                    popup.style.display = 'block';
+                    setTimeout(() => {
+                        popup.style.display = 'none';
+                    }, 5000);
+                }
             }
         });
 
@@ -649,13 +655,11 @@
             const emoji = document.getElementById('test-emoji').value || '😊';
             const text = document.getElementById('test-text').value || '';
 
-            // Shake the screen for 1 second
             document.body.style.animation = 'shake 1s';
             setTimeout(() => {
                 document.body.style.animation = '';
             }, 1000);
 
-            // Show broadcast popup after 1 second with "Hello" and custom text
             setTimeout(() => {
                 const popup = document.getElementById('broadcast-popup');
                 popup.textContent = `Hello ${emoji} ${text}`;
@@ -664,6 +668,23 @@
                     popup.style.display = 'none';
                 }, 2000);
             }, 1000);
+        }
+
+        function showHome() {
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('packages-section').style.display = 'none';
+            document.getElementById('more-section').style.display = 'none';
+        }
+
+        function showMoreSection() {
+            document.getElementById('more-section').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('packages-section').style.display = 'none';
+        }
+
+        function hideMoreSection() {
+            document.getElementById('more-section').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
         }
     </script>
 </body>
