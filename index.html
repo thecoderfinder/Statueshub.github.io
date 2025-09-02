@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statues Hub</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            transition: all 0.5s ease;
+            position: relative;
+            height: 100vh;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: fall linear infinite;
+            will-change: transform;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        nav {
+            width: 100%;
+            background: linear-gradient(120deg, #4b0082, #1a1a2e);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.5s ease;
+            will-change: transform;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        nav a {
+            color: #d4a4eb;
+            text-decoration: none;
+            margin: 0 20px;
+            font-weight: bold;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 15px #d4a4eb;
+        }
+        .content {
+            text-align: center;
+            padding: 60px 0;
+            background: linear-gradient(120deg, rgba(75, 0, 130, 0.8), rgba(26, 26, 46, 0.8));
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            margin-top: 30px;
+            width: 85%;
+            max-width: 1000px;
+            animation: fadeIn 1s ease;
+            will-change: opacity;
+            position: relative;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .content h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px #d4a4eb;
+            animation: bounceIn 1s ease;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .content p {
+            color: #d4a4eb;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            animation: slideUp 1s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .nav-btn {
+            background-color: #2a2a4e;
+            padding: 15px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #d4a4eb;
+            animation: float 6s ease-in-out infinite;
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%232a2a4e"/><text x="50" y="30" font-size="20" fill="%235a8de7" text-anchor="middle">&lt;/&gt;</text><text x="50" y="70" font-size="16" fill="%23fff" text-anchor="middle">Scripts</text></svg>') no-repeat center;
+            background-size: contain;
+            will-change: transform;
+        }
+        .nav-btn:nth-child(2) {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%232a2a4e"/><text x="50" y="30" font-size="20" fill="%235a8de7" text-anchor="middle">📦</text><text x="50" y="70" font-size="16" fill="%23fff" text-anchor="middle">Packages</text></svg>') no-repeat center;
+            background-size: contain;
+            animation: float 6s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+        .nav-btn:nth-child(3) {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%232a2a4e"><path d="M50 20 L30 40 L70 40 Z" fill="%235a8de7"/></rect><text x="50" y="70" font-size="16" fill="%23fff" text-anchor="middle">Tutorials</text></svg>') no-repeat center;
+            background-size: contain;
+            animation: float 6s ease-in-out infinite;
+            animation-delay: 4s;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
+        .nav-btn:hover {
+            background-color: #3a3a6e;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            animation: fadeIn 1s ease 0.5s backwards;
+        }
+        .btn {
+            background: linear-gradient(135deg, #a9b1d6, #d4a4eb);
+            color: #000000;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 20px rgba(169, 177, 214, 0.6);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            animation: pulse 2s infinite;
+            will-change: transform;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #d4a4eb, #a9b1d6);
+            box-shadow: 0 10px 30px rgba(212, 164, 235, 0.8);
+        }
+        .second-section {
+            display: none;
+            width: 85%;
+            max-width: 1000px;
+            margin-top: 40px;
+            background: linear-gradient(120deg, #4b0082, #1a1a2e);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            position: relative;
+            animation: slideIn 0.5s ease;
+            will-change: transform, opacity;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2em;
+            cursor: pointer;
+            color: #d4a4eb;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            animation: rotateIn 0.5s ease;
+        }
+        @keyframes rotateIn {
+            from { transform: rotate(-90deg); opacity: 0; }
+            to { transform: rotate(0); opacity: 1; }
+        }
+        .close-btn:hover {
+            color: #ffffff;
+            text-shadow: 0 0 15px #d4a4eb;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            animation: bounceIn 1s ease;
+        }
+        .item {
+            background: linear-gradient(135deg, #16213e, #2a2a4e);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 1s ease;
+            display: block;
+            will-change: transform;
+            cursor: pointer;
+        }
+        .item.hidden {
+            display: none;
+        }
+        .item:hover {
+            background: linear-gradient(135deg, #2a2a4e, #3a3a6e);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .item a {
+            color: #d4a4eb;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .pagination {
+            margin-top: 30px;
+            color: #d4a4eb;
+            text-align: center;
+            animation: fadeIn 1s ease 0.5s backwards;
+        }
+        #background-options {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: linear-gradient(135deg, #4b0082, #1a1a2e);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            z-index: 99;
+            width: 200px;
+            animation: slideDown 0.5s ease;
+            will-change: transform;
+        }
+        .bg-btn {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #a9b1d6, #d4a4eb);
+            color: #000000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        .bg-btn:hover {
+            background: linear-gradient(135deg, #d4a4eb, #a9b1d6);
+        }
+        #admin-panel {
+            display: none;
+            width: 85%;
+            max-width: 1000px;
+            margin-top: 40px;
+            background: linear-gradient(120deg, #4b0082, #1a1a2e);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            animation: slideIn 0.5s ease;
+            will-change: transform, opacity;
+        }
+        #admin-panel input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: none;
+        }
+        #admin-panel button {
+            background: linear-gradient(135deg, #a9b1d6, #d4a4eb);
+            color: #000000;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+            transition: background 0.3s ease;
+        }
+        #admin-panel button:hover {
+            background: linear-gradient(135deg, #d4a4eb, #a9b1d6);
+        }
+        .options-section {
+            display: none;
+            width: 85%;
+            max-width: 1000px;
+            margin-top: 40px;
+            background: linear-gradient(120deg, #4b0082, #1a1a2e);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            position: relative;
+            animation: slideIn 0.5s ease;
+            will-change: transform, opacity;
+        }
+        .option-btn {
+            background: linear-gradient(135deg, #a9b1d6, #d4a4eb);
+            color: #000000;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 20px rgba(169, 177, 214, 0.6);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            margin: 10px 0;
+            width: 200px;
+        }
+        .option-btn:hover {
+            background: linear-gradient(135deg, #d4a4eb, #a9b1d6);
+            box-shadow: 0 10px 30px rgba(212, 164, 235, 0.8);
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(120deg, #4b0082, #1a1a2e);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            text-align: center;
+            max-width: 200px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content, .second-section, .options-section {
+                width: 90%;
+                padding: 20px;
+            }
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .nav-btn {
+                width: 100px;
+                height: 100px;
+                margin: 10px 0;
+            }
+            .buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            .option-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            .popup {
+                bottom: 10px;
+                right: 10px;
+                max-width: 150px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="stars"></div>
+        <nav>
+            <a href="#" onclick="checkPassword()">Statues Hub</a>
+            <a href="#">Home</a>
+            <a href="#" onclick="toggleBackgroundOptions()">Background</a>
+            <a href="#">More</a>
+        </nav>
+        <div class="content" id="main-content">
+            <h1>Welcome to Statues Hub</h1>
+            <p>Your ultimate destination for Unity packages, videos, and more.</p>
+            <div class="nav-buttons">
+                <div class="nav-btn"><span class="icon"></span>Scripts</div>
+                <div class="nav-btn"><span class="icon"></span>Packages</div>
+                <div class="nav-btn"><span class="icon"></span>Tutorials</div>
+            </div>
+            <div class="buttons">
+                <button class="btn">Join Server</button>
+                <button class="btn" onclick="showPackagesSection()">Unity Packages and Videos</button>
+            </div>
+        </div>
+        <div class="second-section" id="packages-section">
+            <span class="close-btn" onclick="hidePackagesSection()">&times;</span>
+            <input type="text" class="search-bar" placeholder="Search Videos and Unity Packages..." oninput="filterItems(this.value)">
+            <div class="item" onclick="showOptionsSection()">Statues Clean Up</div>
+        </div>
+        <div class="options-section" id="options-section">
+            <span class="close-btn" onclick="hideOptionsSection()">&times;</span>
+            <button class="option-btn" onclick="showYoutubePopup()">Youtube</button>
+            <button class="option-btn" onclick="downloadScript()">Download</button>
+        </div>
+        <div id="youtube-popup" class="popup">
+            <p>Coming Soon</p>
+        </div>
+        <div id="background-options">
+            <button class="bg-btn" onclick="changeBackground('#1a1a2e')">Dark Navy</button>
+            <button class="bg-btn" onclick="changeBackground('linear-gradient(135deg, #4b0082, #1a1a2e, #ffffff)')">Purple Navy White</button>
+            <button class="bg-btn" onclick="changeBackground('linear-gradient(135deg, #1a1a2e, #4b0082, #ffffff)')">Navy Purple White</button>
+        </div>
+        <div id="admin-panel">
+            <h2>Owner Access Panel</h2>
+            <input type="text" id="global-message" placeholder="Enter global message...">
+            <button onclick="sendGlobalMessage()">Send Global Message</button>
+            <button onclick="toggleDebugMode()">Toggle Debug Mode</button>
+            <p>Note: All actions are client-side and do not affect any real server or website.</p>
+        </div>
+    </div>
+
+    <script>
+        // Create falling dots (stars)
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = `${Math.random() * 2 + 1}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        function showPackagesSection() {
+            document.getElementById('packages-section').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+        }
+
+        function hidePackagesSection() {
+            document.getElementById('packages-section').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }
+
+        function showOptionsSection() {
+            document.getElementById('options-section').style.display = 'block';
+            document.getElementById('packages-section').style.display = 'none';
+        }
+
+        function hideOptionsSection() {
+            document.getElementById('options-section').style.display = 'none';
+            document.getElementById('packages-section').style.display = 'block';
+        }
+
+        function showYoutubePopup() {
+            document.getElementById('youtube-popup').style.display = 'block';
+        }
+
+        function downloadScript() {
+            const scriptContent = `#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
+using System.IO;
+using TMPro;
+
+public class OrganizeShii : EditorWindow
+{
+    private string scriptsFolder = "Assets/Scripts";
+    private string materialsFolder = "Assets/Textures";
+    private string modelsFolder = "Assets/Mesh";
+    private string animationsFolder = "Assets/Animations";
+    private string audioFolder = "Assets/Audio";
+    private string shadersFolder = "Assets/Shaders";
+    private string prefabsFolder = "Assets/Prefabs";
+    private string tmpFolder = "Assets/TextMeshPro";
+    private string legacyFontFolder = "Assets/Fonts";
+
+    private TMP_FontAsset targetFont;
+
+    [MenuItem("Tools/Organize Shii")]
+    private static void ShowWindow()
+    {
+        GetWindow<OrganizeShii>("Organize Shii");
+    }
+
+    private void OnGUI()
+    {
+        GUIStyle headerStyle = new GUIStyle(EditorStyles.boldLabel);
+        headerStyle.fontSize = 14;
+        headerStyle.alignment = TextAnchor.MiddleCenter;
+        GUILayout.Label("Made by StatuerXr HEHE", headerStyle);
+
+        GUILayout.Space(10);
+
+        GUILayout.Label("Organize Shii", EditorStyles.boldLabel);
+        GUILayout.Space(10);
+
+        scriptsFolder = DrawPathField("Scripts Folder:", scriptsFolder);
+        materialsFolder = DrawPathField("Materials/Textures Folder:", materialsFolder);
+        modelsFolder = DrawPathField("Models Folder:", modelsFolder);
+        animationsFolder = DrawPathField("Animations Folder:", animationsFolder);
+        audioFolder = DrawPathField("Audio Folder:", audioFolder);
+        shadersFolder = DrawPathField("Shaders Folder:", shadersFolder);
+        prefabsFolder = DrawPathField("Prefabs Folder:", prefabsFolder);
+        tmpFolder = DrawPathField("TextMeshPro Folder:", tmpFolder);
+        legacyFontFolder = DrawPathField("Legacy Fonts Folder:", legacyFontFolder);
+
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("Organize All"))
+        {
+            OrganizeFiles("*.cs", scriptsFolder);
+
+            OrganizeFiles("*.mat", materialsFolder);
+            OrganizeFiles("*.png", materialsFolder);
+            OrganizeFiles("*.jpg", materialsFolder);
+
+            OrganizeFiles("*.FBX", modelsFolder);
+            OrganizeFiles("*.fbx", modelsFolder);
+            OrganizeFiles("*.blend", modelsFolder);
+            OrganizeFiles("*.mesh", modelsFolder);
+
+            OrganizeFiles("*.anim", animationsFolder);
+            OrganizeFiles("*.controller", animationsFolder);
+
+            OrganizeFiles("*.mp3", audioFolder);
+            OrganizeFiles("*.wav", audioFolder);
+            OrganizeFiles("*.ogg", audioFolder);
+
+            OrganizeFiles("*.shader", shadersFolder);
+            OrganizeFiles("*.compute", shadersFolder);
+
+            OrganizeFiles("*.prefab", prefabsFolder);
+
+            OrganizeFiles("*.asset", tmpFolder);
+            OrganizeFiles("*.spriteatlas", tmpFolder);
+            OrganizeFiles("*.spriteatlasv2", tmpFolder);
+
+            OrganizeFiles("*.ttf", legacyFontFolder);
+            OrganizeFiles("*.otf", legacyFontFolder);
+            OrganizeFiles("*.fontsettings", legacyFontFolder);
+        }
+
+        GUILayout.Space(10);
+
+        GUILayout.Label("TextMesh Pro Utilities", EditorStyles.boldLabel);
+        targetFont = (TMP_FontAsset)EditorGUILayout.ObjectField("Target TMP Font", targetFont, typeof(TMP_FontAsset), false);
+
+        if (GUILayout.Button("Apply Font to All TMP Texts"))
+        {
+            ApplyFontToAllTMP();
+        }
+
+        GUILayout.Space(10);
+        GUILayout.Label("Cleanup", EditorStyles.boldLabel);
+
+        if (GUILayout.Button("Remove All Missing Scripts In Scene"))
+        {
+            int removed = RemoveMissingScripts();
+            EditorUtility.DisplayDialog("Missing Scripts Removed", $"Removed {removed} missing script reference(s).", "OK");
+        }
+
+        GUILayout.Space(10);
+        EditorGUILayout.HelpBox("Organize assets, apply fonts to TextMeshPro components, and clean up missing scripts in the scene.", MessageType.Info);
+    }
+
+    private string DrawPathField(string label, string path)
+    {
+        EditorGUILayout.LabelField(label);
+        return EditorGUILayout.TextField(path);
+    }
+
+    private void OrganizeFiles(string fileExtension, string targetFolder)
+    {
+        if (!AssetDatabase.IsValidFolder(targetFolder))
+        {
+            Directory.CreateDirectory(targetFolder);
+            AssetDatabase.Refresh();
+        }
+
+        string[] allFiles = Directory.GetFiles("Assets", fileExtension, SearchOption.AllDirectories);
+        int movedFilesCount = 0;
+
+        foreach (string filePath in allFiles)
+        {
+            string relativePath = filePath.Replace("\\", "/");
+            string folderPath = Path.GetDirectoryName(relativePath).Replace("\\", "/");
+
+            if (folderPath == "Assets" && !relativePath.StartsWith(targetFolder))
+            {
+                string fileName = Path.GetFileName(relativePath);
+                string newFilePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
+
+                var error = AssetDatabase.MoveAsset(relativePath, newFilePath);
+                if (string.IsNullOrEmpty(error))
+                    movedFilesCount++;
+            }
+        }
+
+        AssetDatabase.Refresh();
+        Debug.Log($"Moved {movedFilesCount} files with extension {fileExtension} to {targetFolder}.");
+    }
+
+    private void ApplyFontToAllTMP()
+    {
+        if (targetFont == null)
+        {
+            EditorUtility.DisplayDialog("Error", "Please assign a TMP font asset before applying.", "OK");
+            return;
+        }
+
+        int count = 0;
+        TMP_Text[] tmpTexts = FindObjectsOfType<TMP_Text>();
+
+        foreach (TMP_Text tmp in tmpTexts)
+        {
+            Undo.RecordObject(tmp, "Set TMP Font");
+            tmp.font = targetFont;
+            tmp.ForceMeshUpdate();
+            EditorUtility.SetDirty(tmp);
+            count++;
+        }
+
+        EditorUtility.DisplayDialog("Success", $"Font applied to {count} TMP components!", "OK");
+    }
+
+    private int RemoveMissingScripts()
+    {
+        int count = 0;
+        GameObject[] allObjects = FindObjectsOfType<GameObject>(true);
+
+        foreach (GameObject go in allObjects)
+        {
+            int removed = GameObjectUtility.RemoveMonoBehavioursWithMissingScript(go);
+            if (removed > 0)
+            {
+                count += removed;
+                EditorUtility.SetDirty(go);
+            }
+        }
+
+        if (count > 0)
+            AssetDatabase.SaveAssets();
+
+        Debug.Log($"Removed {count} missing script reference(s) from scene.");
+        return count;
+    }
+}
+#endif`;
+            const blob = new Blob([scriptContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'OrganizeShii.cs';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function toggleBackgroundOptions() {
+            const options = document.getElementById('background-options');
+            options.style.display = options.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function changeBackground(color) {
+            document.body.style.backgroundColor = color.includes('gradient') ? '' : color;
+            if (color.includes('gradient')) {
+                document.body.style.background = color;
+            }
+            toggleBackgroundOptions();
+        }
+
+        function checkPassword() {
+            const password = prompt('Enter password for owner access:');
+            if (password === '80') {
+                document.getElementById('admin-panel').style.display = 'block';
+            } else {
+                alert('Incorrect password!');
+            }
+        }
+
+        function sendGlobalMessage() {
+            const message = document.getElementById('global-message').value;
+            if (message) {
+                alert(`Global Message Sent: ${message}`);
+            }
+        }
+
+        let debugMode = false;
+        function toggleDebugMode() {
+            debugMode = !debugMode;
+            if (debugMode) {
+                console.log('Debug Mode Activated');
+                alert('Debug Mode ON - Check console for logs.');
+            } else {
+                console.log('Debug Mode Deactivated');
+                alert('Debug Mode OFF');
+            }
+        }
+
+        function filterItems(query) {
+            const items = document.querySelectorAll('.item');
+            items.forEach(item => {
+                if (item.textContent.toLowerCase().includes(query.toLowerCase())) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
