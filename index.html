@@ -371,6 +371,51 @@
             text-align: center;
             max-width: 200px;
         }
+        @keyframes shake {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-5px, 5px); }
+            50% { transform: translate(5px, -5px); }
+            75% { transform: translate(-5px, 5px); }
+            100% { transform: translate(0, 0); }
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(120deg, #4b0082, #1a1a2e);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            z-index: 1001;
+            text-align: center;
+            color: #d4a4eb;
+            animation: fadeInNotification 0.3s ease, fadeOutNotification 0.5s ease 4.7s forwards;
+            display: none;
+        }
+        @keyframes fadeInNotification {
+            from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes fadeOutNotification {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        }
+        .broadcast-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(120deg, #4b0082, #1a1a2e);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            z-index: 1001;
+            text-align: center;
+            font-size: 1.5em;
+            color: #d4a4eb;
+        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -405,6 +450,15 @@
                 max-width: 150px;
                 padding: 10px;
             }
+            .notification {
+                top: 10px;
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+            .broadcast-popup {
+                font-size: 1.2em;
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -438,7 +492,7 @@
         <div class="options-section" id="options-section">
             <span class="close-btn" onclick="hideOptionsSection()">&times;</span>
             <button class="option-btn" onclick="showYoutubePopup()">Youtube</button>
-            <button class="option-btn" onclick="downloadScript()">Download</button>
+            <button class="option-btn" onclick="showDownloadNotification()">Download</button>
         </div>
         <div id="youtube-popup" class="popup">
             <p>Coming Soon</p>
@@ -452,9 +506,14 @@
             <h2>Owner Access Panel</h2>
             <input type="text" id="global-message" placeholder="Enter global message...">
             <button onclick="sendGlobalMessage()">Send Global Message</button>
+            <input type="text" id="test-emoji" placeholder="Enter emoji (e.g., 😊)">
+            <input type="text" id="test-text" placeholder="Enter text after Hello">
+            <button onclick="activateTestMode()">Test Mode</button>
             <button onclick="toggleDebugMode()">Toggle Debug Mode</button>
             <p>Note: All actions are client-side and do not affect any real server or website.</p>
         </div>
+        <div id="broadcast-popup" class="broadcast-popup"></div>
+        <div id="notification" class="notification"></div>
     </div>
 
     <script>
@@ -498,204 +557,13 @@
             document.getElementById('youtube-popup').style.display = 'block';
         }
 
-        function downloadScript() {
-            const scriptContent = `#if UNITY_EDITOR
-using UnityEditor;
-using UnityEngine;
-using System.IO;
-using TMPro;
-
-public class OrganizeShii : EditorWindow
-{
-    private string scriptsFolder = "Assets/Scripts";
-    private string materialsFolder = "Assets/Textures";
-    private string modelsFolder = "Assets/Mesh";
-    private string animationsFolder = "Assets/Animations";
-    private string audioFolder = "Assets/Audio";
-    private string shadersFolder = "Assets/Shaders";
-    private string prefabsFolder = "Assets/Prefabs";
-    private string tmpFolder = "Assets/TextMeshPro";
-    private string legacyFontFolder = "Assets/Fonts";
-
-    private TMP_FontAsset targetFont;
-
-    [MenuItem("Tools/Organize Shii")]
-    private static void ShowWindow()
-    {
-        GetWindow<OrganizeShii>("Organize Shii");
-    }
-
-    private void OnGUI()
-    {
-        GUIStyle headerStyle = new GUIStyle(EditorStyles.boldLabel);
-        headerStyle.fontSize = 14;
-        headerStyle.alignment = TextAnchor.MiddleCenter;
-        GUILayout.Label("Made by StatuerXr HEHE", headerStyle);
-
-        GUILayout.Space(10);
-
-        GUILayout.Label("Organize Shii", EditorStyles.boldLabel);
-        GUILayout.Space(10);
-
-        scriptsFolder = DrawPathField("Scripts Folder:", scriptsFolder);
-        materialsFolder = DrawPathField("Materials/Textures Folder:", materialsFolder);
-        modelsFolder = DrawPathField("Models Folder:", modelsFolder);
-        animationsFolder = DrawPathField("Animations Folder:", animationsFolder);
-        audioFolder = DrawPathField("Audio Folder:", audioFolder);
-        shadersFolder = DrawPathField("Shaders Folder:", shadersFolder);
-        prefabsFolder = DrawPathField("Prefabs Folder:", prefabsFolder);
-        tmpFolder = DrawPathField("TextMeshPro Folder:", tmpFolder);
-        legacyFontFolder = DrawPathField("Legacy Fonts Folder:", legacyFontFolder);
-
-        GUILayout.Space(10);
-
-        if (GUILayout.Button("Organize All"))
-        {
-            OrganizeFiles("*.cs", scriptsFolder);
-
-            OrganizeFiles("*.mat", materialsFolder);
-            OrganizeFiles("*.png", materialsFolder);
-            OrganizeFiles("*.jpg", materialsFolder);
-
-            OrganizeFiles("*.FBX", modelsFolder);
-            OrganizeFiles("*.fbx", modelsFolder);
-            OrganizeFiles("*.blend", modelsFolder);
-            OrganizeFiles("*.mesh", modelsFolder);
-
-            OrganizeFiles("*.anim", animationsFolder);
-            OrganizeFiles("*.controller", animationsFolder);
-
-            OrganizeFiles("*.mp3", audioFolder);
-            OrganizeFiles("*.wav", audioFolder);
-            OrganizeFiles("*.ogg", audioFolder);
-
-            OrganizeFiles("*.shader", shadersFolder);
-            OrganizeFiles("*.compute", shadersFolder);
-
-            OrganizeFiles("*.prefab", prefabsFolder);
-
-            OrganizeFiles("*.asset", tmpFolder);
-            OrganizeFiles("*.spriteatlas", tmpFolder);
-            OrganizeFiles("*.spriteatlasv2", tmpFolder);
-
-            OrganizeFiles("*.ttf", legacyFontFolder);
-            OrganizeFiles("*.otf", legacyFontFolder);
-            OrganizeFiles("*.fontsettings", legacyFontFolder);
-        }
-
-        GUILayout.Space(10);
-
-        GUILayout.Label("TextMesh Pro Utilities", EditorStyles.boldLabel);
-        targetFont = (TMP_FontAsset)EditorGUILayout.ObjectField("Target TMP Font", targetFont, typeof(TMP_FontAsset), false);
-
-        if (GUILayout.Button("Apply Font to All TMP Texts"))
-        {
-            ApplyFontToAllTMP();
-        }
-
-        GUILayout.Space(10);
-        GUILayout.Label("Cleanup", EditorStyles.boldLabel);
-
-        if (GUILayout.Button("Remove All Missing Scripts In Scene"))
-        {
-            int removed = RemoveMissingScripts();
-            EditorUtility.DisplayDialog("Missing Scripts Removed", $"Removed {removed} missing script reference(s).", "OK");
-        }
-
-        GUILayout.Space(10);
-        EditorGUILayout.HelpBox("Organize assets, apply fonts to TextMeshPro components, and clean up missing scripts in the scene.", MessageType.Info);
-    }
-
-    private string DrawPathField(string label, string path)
-    {
-        EditorGUILayout.LabelField(label);
-        return EditorGUILayout.TextField(path);
-    }
-
-    private void OrganizeFiles(string fileExtension, string targetFolder)
-    {
-        if (!AssetDatabase.IsValidFolder(targetFolder))
-        {
-            Directory.CreateDirectory(targetFolder);
-            AssetDatabase.Refresh();
-        }
-
-        string[] allFiles = Directory.GetFiles("Assets", fileExtension, SearchOption.AllDirectories);
-        int movedFilesCount = 0;
-
-        foreach (string filePath in allFiles)
-        {
-            string relativePath = filePath.Replace("\\", "/");
-            string folderPath = Path.GetDirectoryName(relativePath).Replace("\\", "/");
-
-            if (folderPath == "Assets" && !relativePath.StartsWith(targetFolder))
-            {
-                string fileName = Path.GetFileName(relativePath);
-                string newFilePath = Path.Combine(targetFolder, fileName).Replace("\\", "/");
-
-                var error = AssetDatabase.MoveAsset(relativePath, newFilePath);
-                if (string.IsNullOrEmpty(error))
-                    movedFilesCount++;
-            }
-        }
-
-        AssetDatabase.Refresh();
-        Debug.Log($"Moved {movedFilesCount} files with extension {fileExtension} to {targetFolder}.");
-    }
-
-    private void ApplyFontToAllTMP()
-    {
-        if (targetFont == null)
-        {
-            EditorUtility.DisplayDialog("Error", "Please assign a TMP font asset before applying.", "OK");
-            return;
-        }
-
-        int count = 0;
-        TMP_Text[] tmpTexts = FindObjectsOfType<TMP_Text>();
-
-        foreach (TMP_Text tmp in tmpTexts)
-        {
-            Undo.RecordObject(tmp, "Set TMP Font");
-            tmp.font = targetFont;
-            tmp.ForceMeshUpdate();
-            EditorUtility.SetDirty(tmp);
-            count++;
-        }
-
-        EditorUtility.DisplayDialog("Success", $"Font applied to {count} TMP components!", "OK");
-    }
-
-    private int RemoveMissingScripts()
-    {
-        int count = 0;
-        GameObject[] allObjects = FindObjectsOfType<GameObject>(true);
-
-        foreach (GameObject go in allObjects)
-        {
-            int removed = GameObjectUtility.RemoveMonoBehavioursWithMissingScript(go);
-            if (removed > 0)
-            {
-                count += removed;
-                EditorUtility.SetDirty(go);
-            }
-        }
-
-        if (count > 0)
-            AssetDatabase.SaveAssets();
-
-        Debug.Log($"Removed {count} missing script reference(s) from scene.");
-        return count;
-    }
-}
-#endif`;
-            const blob = new Blob([scriptContent], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'OrganizeShii.cs';
-            a.click();
-            window.URL.revokeObjectURL(url);
+        function showDownloadNotification() {
+            const notification = document.getElementById('notification');
+            notification.textContent = 'Not official yet, still being verified';
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000); // Disappear after 5 seconds
         }
 
         function toggleBackgroundOptions() {
@@ -723,7 +591,12 @@ public class OrganizeShii : EditorWindow
         function sendGlobalMessage() {
             const message = document.getElementById('global-message').value;
             if (message) {
-                alert(`Global Message Sent: ${message}`);
+                const popup = document.getElementById('broadcast-popup');
+                popup.textContent = message;
+                popup.style.display = 'block';
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                }, 5000); // Disappear after 5 seconds
             }
         }
 
@@ -748,6 +621,27 @@ public class OrganizeShii : EditorWindow
                     item.classList.add('hidden');
                 }
             });
+        }
+
+        function activateTestMode() {
+            const emoji = document.getElementById('test-emoji').value || '😊';
+            const text = document.getElementById('test-text').value || '';
+
+            // Shake the screen for 1 second
+            document.body.style.animation = 'shake 1s';
+            setTimeout(() => {
+                document.body.style.animation = '';
+            }, 1000);
+
+            // Show broadcast popup after 1 second with "Hello" and custom text
+            setTimeout(() => {
+                const popup = document.getElementById('broadcast-popup');
+                popup.textContent = `Hello ${emoji} ${text}`;
+                popup.style.display = 'block';
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                }, 2000); // Close after 2 seconds
+            }, 1000);
         }
     </script>
 </body>
