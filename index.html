@@ -523,16 +523,22 @@
             <input type="text" class="search-bar" placeholder="Search Videos and Unity Packages..." oninput="filterItems(this.value)">
             <div class="item" onclick="showOptionsSection()">Statues Clean Up</div>
             <div class="item" onclick="showBanOptionsSection()">Showing PlayFab Ban Reason and Time</div>
+            <div class="item" onclick="showMonsterFootstepsClosedSection()">Monster Footsteps Closed</div>
         </div>
         <div class="options-section" id="options-section" style="display: none;">
             <span class="close-btn" onclick="hideOptionsSection()">&times;</span>
             <button class="option-btn" onclick="showYoutubePopup()">Youtube</button>
-            <button class="option-btn" onclick="downloadStatuesCleanup()">Download</button>
+            <button class="option-btn" onclick="downloadStatuesCleanUp()">Download</button>
         </div>
         <div class="options-section" id="ban-options-section" style="display: none;">
             <span class="close-btn" onclick="hideBanOptionsSection()">&times;</span>
             <button class="option-btn" onclick="showYoutubePopup()">Youtube</button>
-            <button class="option-btn" onclick="downloadBanInfo()">Download</button>
+            <button class="option-btn" onclick="downloadPlayfabLogin()">Download</button>
+        </div>
+        <div class="options-section" id="monster-footsteps-closed-section" style="display: none;">
+            <span class="close-btn" onclick="hideMonsterFootstepsClosedSection()">&times;</span>
+            <button class="option-btn" onclick="openYoutubeLink('https://youtu.be/0P2iL7GxbDk')">Youtube</button>
+            <button class="option-btn" onclick="downloadMonsterFootstepsClosed()">Download</button>
         </div>
         <div class="second-section" id="more-section" style="display: none;">
             <span class="close-btn" onclick="hideMoreSection()">&times;</span>
@@ -645,6 +651,7 @@
             document.getElementById('more-section').style.display = 'none';
             document.getElementById('options-section').style.display = 'none';
             document.getElementById('ban-options-section').style.display = 'none';
+            document.getElementById('monster-footsteps-closed-section').style.display = 'none';
         }
 
         function hidePackagesSection() {
@@ -656,6 +663,7 @@
             document.getElementById('options-section').style.display = 'block';
             document.getElementById('packages-section').style.display = 'none';
             document.getElementById('ban-options-section').style.display = 'none';
+            document.getElementById('monster-footsteps-closed-section').style.display = 'none';
         }
 
         function hideOptionsSection() {
@@ -667,10 +675,23 @@
             document.getElementById('ban-options-section').style.display = 'block';
             document.getElementById('packages-section').style.display = 'none';
             document.getElementById('options-section').style.display = 'none';
+            document.getElementById('monster-footsteps-closed-section').style.display = 'none';
         }
 
         function hideBanOptionsSection() {
             document.getElementById('ban-options-section').style.display = 'none';
+            document.getElementById('packages-section').style.display = 'block';
+        }
+
+        function showMonsterFootstepsClosedSection() {
+            document.getElementById('monster-footsteps-closed-section').style.display = 'block';
+            document.getElementById('packages-section').style.display = 'none';
+            document.getElementById('options-section').style.display = 'none';
+            document.getElementById('ban-options-section').style.display = 'none';
+        }
+
+        function hideMonsterFootstepsClosedSection() {
+            document.getElementById('monster-footsteps-closed-section').style.display = 'none';
             document.getElementById('packages-section').style.display = 'block';
         }
 
@@ -681,11 +702,13 @@
             }, 5000);
         }
 
-        function downloadStatuesCleanup() {
-            alert('Still Verifying');
+        function openYoutubeLink(url) {
+            if (confirm('Would you like to open the YouTube link?')) {
+                window.open(url, '_blank');
+            }
         }
 
-        function downloadBanInfo() {
+        function downloadPlayfabLogin() {
             const code = `using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -896,6 +919,120 @@ public class Playfablogin : MonoBehaviour
             a.click();
         }
 
+        function downloadStatuesCleanUp() {
+            const code = `using UnityEngine;
+
+public class StatuesCleanUp : MonoBehaviour
+{
+    // Placeholder script for Statues Clean Up functionality
+    // Add your Statues Clean Up logic here
+    void Start()
+    {
+        Debug.Log("Statues Clean Up initialized.");
+    }
+
+    void Update()
+    {
+        // Example cleanup logic
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            CleanUpStatues();
+        }
+    }
+
+    void CleanUpStatues()
+    {
+        // Implement statue cleanup logic here
+        Debug.Log("Cleaning up statues...");
+    }
+}`;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'StatuesCleanUp.cs';
+            a.click();
+        }
+
+        function downloadMonsterFootstepsClosed() {
+            const code = `using UnityEngine;
+using System.Collections.Generic;
+
+[RequireComponent(typeof(AudioSource))]
+public class MonsterFootstepAudio : MonoBehaviour
+{
+    [Header("🎵 Footstep Clips")]
+    public List<AudioClip> footstepClips = new List<AudioClip>();
+
+    [Header("🏃 Movement Settings")]
+    public Transform monsterRoot;
+    public float minSpeedThreshold = 0.1f;
+    public float baseInterval = 1f;
+
+    [Header("🔊 Audio Settings")]
+    public float basePitch = 1f;
+    public float pitchMultiplier = 0.05f;
+    public float maxPitch = 2f;
+    public float spatialBlend = 1f;
+    public float volume = 1f;
+
+    private AudioSource audioSource;
+    private Vector3 lastPosition;
+    private float timer = 0f;
+    private int clipIndex = 0;
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        audioSource.spatialBlend = spatialBlend;
+        audioSource.volume = volume;
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+    }
+
+    void Start()
+    {
+        lastPosition = monsterRoot.position;
+    }
+
+    void Update()
+    {
+        float speed = (monsterRoot.position - lastPosition).magnitude / Time.deltaTime;
+        lastPosition = monsterRoot.position;
+
+        if (speed < minSpeedThreshold || footstepClips.Count == 0)
+        {
+            timer = 0f;
+            return;
+        }
+
+        float interval = baseInterval / speed;
+        timer += Time.deltaTime;
+
+        if (timer >= interval)
+        {
+            PlayNextClip(speed);
+            timer = 0f;
+        }
+    }
+
+    void PlayNextClip(float speed)
+    {
+        if (footstepClips.Count == 0) return;
+
+        audioSource.clip = footstepClips[clipIndex];
+        audioSource.pitch = Mathf.Clamp(basePitch + speed * pitchMultiplier, basePitch, maxPitch);
+        audioSource.Play();
+
+        clipIndex = (clipIndex + 1) % footstepClips.Count;
+    }
+}`;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sd.cs';
+            a.click();
+        }
+
         function toggleBackgroundOptions() {
             const options = document.getElementById('background-options');
             options.style.display = options.style.display === 'block' ? 'none' : 'block';
@@ -981,6 +1118,7 @@ public class Playfablogin : MonoBehaviour
             document.getElementById('more-section').style.display = 'none';
             document.getElementById('options-section').style.display = 'none';
             document.getElementById('ban-options-section').style.display = 'none';
+            document.getElementById('monster-footsteps-closed-section').style.display = 'none';
         }
 
         function showMoreSection() {
@@ -989,6 +1127,7 @@ public class Playfablogin : MonoBehaviour
             document.getElementById('packages-section').style.display = 'none';
             document.getElementById('options-section').style.display = 'none';
             document.getElementById('ban-options-section').style.display = 'none';
+            document.getElementById('monster-footsteps-closed-section').style.display = 'none';
         }
 
         function hideMoreSection() {
